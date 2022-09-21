@@ -7,14 +7,14 @@ services:
       restart: always
       environment:
          - POSTGRES_USER=betocalestini
-         - POSTGRES_PASSWORD=/cpi10
+         - POSTGRES_PASSWORD=cpi10
          - POSTGRES_DB=udemy
          - TimeZone=America/Sao_Paulo
       ports:
          - '5432:5432'
       volumes:
          - /home/betocalestini/postgres-udemy:/var/lib/postgresql/data
-         - ./migration/docker-database-initial.sql:/docker-entrypoint-initdb.d/docker-database-initial.sql
+         - ./db/migration/docker-database-initial.sql:/docker-entrypoint-initdb.d/docker-database-initial.sql
       networks:
          rede1:
             # aliases:

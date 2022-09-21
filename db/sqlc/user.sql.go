@@ -10,7 +10,13 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email, password, created_at, updated_at, deleted_at
+INSERT INTO users (
+  name, 
+  email, 
+  password
+  ) VALUES (
+    $1, $2, $3
+    ) RETURNING id, name, email, password, created_at, updated_at, deleted_at
 `
 
 type CreateUserParams struct {
@@ -35,7 +41,10 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, name, email, password, created_at, updated_at, deleted_at FROM users WHERE email = $1 LIMIT 1
+SELECT id, name, email, password, created_at, updated_at, deleted_at FROM users 
+  WHERE email = $1 
+  AND deleted_at IS NULL
+  LIMIT 1
 `
 
 func (q *Queries) GetUser(ctx context.Context, email string) (User, error) {
@@ -54,7 +63,10 @@ func (q *Queries) GetUser(ctx context.Context, email string) (User, error) {
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, name, email, password, created_at, updated_at, deleted_at FROM users WHERE id = $1 LIMIT 1
+SELECT id, name, email, password, created_at, updated_at, deleted_at FROM users 
+  WHERE id = $1 
+  AND deleted_at IS NULL
+  LIMIT 1
 `
 
 func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {

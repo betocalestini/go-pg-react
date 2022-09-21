@@ -10,7 +10,14 @@ import (
 )
 
 const createCategory = `-- name: CreateCategory :one
-INSERT INTO categories (user_id, title, type, description) VALUES ($1, $2, $3, $4) RETURNING id, user_id, title, description, type, created_at, updated_at, deleted_at
+INSERT INTO categories (
+  user_id, 
+  title, 
+  type, 
+  description
+  ) VALUES (
+    $1, $2, $3, $4
+    ) RETURNING id, user_id, title, description, type, created_at, updated_at, deleted_at
 `
 
 type CreateCategoryParams struct {
@@ -42,7 +49,9 @@ func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) 
 }
 
 const deleteCategory = `-- name: DeleteCategory :exec
-DELETE FROM categories WHERE id = $1
+UPDATE categories 
+  SET deleted_at = CURRENT_TIMESTAMP
+  WHERE id = $1
 `
 
 func (q *Queries) DeleteCategory(ctx context.Context, id int32) error {
@@ -51,7 +60,12 @@ func (q *Queries) DeleteCategory(ctx context.Context, id int32) error {
 }
 
 const getCategories = `-- name: GetCategories :many
-SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories WHERE user_id = $1 AND type = $2 AND title like $3 AND description LIKE $4
+SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories 
+  WHERE user_id = $1
+  AND deleted_at IS NULL
+  AND type = $2 
+  AND title like $3 
+  AND description LIKE $4
 `
 
 type GetCategoriesParams struct {
@@ -99,7 +113,10 @@ func (q *Queries) GetCategories(ctx context.Context, arg GetCategoriesParams) ([
 }
 
 const getCategory = `-- name: GetCategory :one
-SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories WHERE id = $1 LIMIT 1
+SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories 
+  WHERE id = $1 
+  AND deleted_at IS NULL
+  LIMIT 1
 `
 
 func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
@@ -119,7 +136,10 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
 }
 
 const updateCategory = `-- name: UpdateCategory :one
-UPDATE categories SET title = $2, description = $3 WHERE id = $1 RETURNING id, user_id, title, description, type, created_at, updated_at, deleted_at
+UPDATE categories 
+  SET title = $2, description = $3, updated_at = CURRENT_TIMESTAMP
+  WHERE id = $1 
+  RETURNING id, user_id, title, description, type, created_at, updated_at, deleted_at
 `
 
 type UpdateCategoryParams struct {
