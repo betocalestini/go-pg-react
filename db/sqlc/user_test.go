@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"go-pg-react/util"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,9 +10,9 @@ import (
 
 func CreateRandomUser(t *testing.T) User {
 	arg := CreateUserParams{
-		Name:     "teste",
-		Email:    "teste6@teste.com",
-		Password: "teste123",
+		Name:     util.RandomName(20),
+		Email:    util.RandomEmail(),
+		Password: util.RandomSenha(15),
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
@@ -40,4 +41,19 @@ func TestGetUser(t *testing.T) {
 	require.Equal(t, user1.Password, user2.Password)
 	require.Equal(t, user1.Email, user2.Email)
 	require.NotEmpty(t, user2.CreatedAt)
+}
+
+func TestDeleteUser(t *testing.T) {
+	user1 := CreateRandomUser(t)
+	err := testQueries.DeleteUser(context.Background(), user1.ID)
+	require.NoError(t, err)
+
+	user2, err := testQueries.GetDeletedUser(context.Background(), user1.ID)
+	require.NotEmpty(t, user2.DeletedAt)
+	require.NoError(t, err)
+	require.Equal(t, user1.ID, user2.ID)
+
+	user3, err := testQueries.GetUser(context.Background(), user1.Email)
+	require.Error(t, err)
+	require.Empty(t, user3)
 }

@@ -14,14 +14,21 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteAccount(ctx context.Context, id int32) error
 	DeleteCategory(ctx context.Context, id int32) error
+	DeleteUser(ctx context.Context, id int32) error
 	GetAccount(ctx context.Context, id int32) (Account, error)
 	GetAccounts(ctx context.Context, arg GetAccountsParams) ([]GetAccountsRow, error)
 	GetAccountsGraph(ctx context.Context, arg GetAccountsGraphParams) (int64, error)
 	GetAccountsReports(ctx context.Context, arg GetAccountsReportsParams) (int64, error)
 	GetCategories(ctx context.Context, arg GetCategoriesParams) ([]Category, error)
-	GetCategory(ctx context.Context, id int32) (Category, error)
+	GetCategoriesByTitle(ctx context.Context, title string) ([]Category, error)
+	GetCategoryById(ctx context.Context, id int32) (Category, error)
+	GetDeletedCategories(ctx context.Context) ([]Category, error)
+	GetDeletedCategory(ctx context.Context, id int32) (Category, error)
+	GetDeletedUser(ctx context.Context, id int32) (User, error)
+	GetDeletedUsers(ctx context.Context) ([]User, error)
 	GetUser(ctx context.Context, email string) (User, error)
 	GetUserById(ctx context.Context, id int32) (User, error)
+	GetUsers(ctx context.Context) ([]User, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 	UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error)
 }

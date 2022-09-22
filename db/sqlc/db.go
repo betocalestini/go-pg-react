@@ -39,6 +39,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteCategoryStmt, err = db.PrepareContext(ctx, deleteCategory); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteCategory: %w", err)
 	}
+	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
+	}
 	if q.getAccountStmt, err = db.PrepareContext(ctx, getAccount); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAccount: %w", err)
 	}
@@ -54,14 +57,32 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getCategoriesStmt, err = db.PrepareContext(ctx, getCategories); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCategories: %w", err)
 	}
-	if q.getCategoryStmt, err = db.PrepareContext(ctx, getCategory); err != nil {
-		return nil, fmt.Errorf("error preparing query GetCategory: %w", err)
+	if q.getCategoriesByTitleStmt, err = db.PrepareContext(ctx, getCategoriesByTitle); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCategoriesByTitle: %w", err)
+	}
+	if q.getCategoryByIdStmt, err = db.PrepareContext(ctx, getCategoryById); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCategoryById: %w", err)
+	}
+	if q.getDeletedCategoriesStmt, err = db.PrepareContext(ctx, getDeletedCategories); err != nil {
+		return nil, fmt.Errorf("error preparing query GetDeletedCategories: %w", err)
+	}
+	if q.getDeletedCategoryStmt, err = db.PrepareContext(ctx, getDeletedCategory); err != nil {
+		return nil, fmt.Errorf("error preparing query GetDeletedCategory: %w", err)
+	}
+	if q.getDeletedUserStmt, err = db.PrepareContext(ctx, getDeletedUser); err != nil {
+		return nil, fmt.Errorf("error preparing query GetDeletedUser: %w", err)
+	}
+	if q.getDeletedUsersStmt, err = db.PrepareContext(ctx, getDeletedUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query GetDeletedUsers: %w", err)
 	}
 	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
 	}
 	if q.getUserByIdStmt, err = db.PrepareContext(ctx, getUserById); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserById: %w", err)
+	}
+	if q.getUsersStmt, err = db.PrepareContext(ctx, getUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUsers: %w", err)
 	}
 	if q.updateAccountStmt, err = db.PrepareContext(ctx, updateAccount); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateAccount: %w", err)
@@ -99,6 +120,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteCategoryStmt: %w", cerr)
 		}
 	}
+	if q.deleteUserStmt != nil {
+		if cerr := q.deleteUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
+		}
+	}
 	if q.getAccountStmt != nil {
 		if cerr := q.getAccountStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getAccountStmt: %w", cerr)
@@ -124,9 +150,34 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getCategoriesStmt: %w", cerr)
 		}
 	}
-	if q.getCategoryStmt != nil {
-		if cerr := q.getCategoryStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getCategoryStmt: %w", cerr)
+	if q.getCategoriesByTitleStmt != nil {
+		if cerr := q.getCategoriesByTitleStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCategoriesByTitleStmt: %w", cerr)
+		}
+	}
+	if q.getCategoryByIdStmt != nil {
+		if cerr := q.getCategoryByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCategoryByIdStmt: %w", cerr)
+		}
+	}
+	if q.getDeletedCategoriesStmt != nil {
+		if cerr := q.getDeletedCategoriesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getDeletedCategoriesStmt: %w", cerr)
+		}
+	}
+	if q.getDeletedCategoryStmt != nil {
+		if cerr := q.getDeletedCategoryStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getDeletedCategoryStmt: %w", cerr)
+		}
+	}
+	if q.getDeletedUserStmt != nil {
+		if cerr := q.getDeletedUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getDeletedUserStmt: %w", cerr)
+		}
+	}
+	if q.getDeletedUsersStmt != nil {
+		if cerr := q.getDeletedUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getDeletedUsersStmt: %w", cerr)
 		}
 	}
 	if q.getUserStmt != nil {
@@ -137,6 +188,11 @@ func (q *Queries) Close() error {
 	if q.getUserByIdStmt != nil {
 		if cerr := q.getUserByIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserByIdStmt: %w", cerr)
+		}
+	}
+	if q.getUsersStmt != nil {
+		if cerr := q.getUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUsersStmt: %w", cerr)
 		}
 	}
 	if q.updateAccountStmt != nil {
@@ -186,43 +242,57 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                     DBTX
-	tx                     *sql.Tx
-	createAccountStmt      *sql.Stmt
-	createCategoryStmt     *sql.Stmt
-	createUserStmt         *sql.Stmt
-	deleteAccountStmt      *sql.Stmt
-	deleteCategoryStmt     *sql.Stmt
-	getAccountStmt         *sql.Stmt
-	getAccountsStmt        *sql.Stmt
-	getAccountsGraphStmt   *sql.Stmt
-	getAccountsReportsStmt *sql.Stmt
-	getCategoriesStmt      *sql.Stmt
-	getCategoryStmt        *sql.Stmt
-	getUserStmt            *sql.Stmt
-	getUserByIdStmt        *sql.Stmt
-	updateAccountStmt      *sql.Stmt
-	updateCategoryStmt     *sql.Stmt
+	db                       DBTX
+	tx                       *sql.Tx
+	createAccountStmt        *sql.Stmt
+	createCategoryStmt       *sql.Stmt
+	createUserStmt           *sql.Stmt
+	deleteAccountStmt        *sql.Stmt
+	deleteCategoryStmt       *sql.Stmt
+	deleteUserStmt           *sql.Stmt
+	getAccountStmt           *sql.Stmt
+	getAccountsStmt          *sql.Stmt
+	getAccountsGraphStmt     *sql.Stmt
+	getAccountsReportsStmt   *sql.Stmt
+	getCategoriesStmt        *sql.Stmt
+	getCategoriesByTitleStmt *sql.Stmt
+	getCategoryByIdStmt      *sql.Stmt
+	getDeletedCategoriesStmt *sql.Stmt
+	getDeletedCategoryStmt   *sql.Stmt
+	getDeletedUserStmt       *sql.Stmt
+	getDeletedUsersStmt      *sql.Stmt
+	getUserStmt              *sql.Stmt
+	getUserByIdStmt          *sql.Stmt
+	getUsersStmt             *sql.Stmt
+	updateAccountStmt        *sql.Stmt
+	updateCategoryStmt       *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                     tx,
-		tx:                     tx,
-		createAccountStmt:      q.createAccountStmt,
-		createCategoryStmt:     q.createCategoryStmt,
-		createUserStmt:         q.createUserStmt,
-		deleteAccountStmt:      q.deleteAccountStmt,
-		deleteCategoryStmt:     q.deleteCategoryStmt,
-		getAccountStmt:         q.getAccountStmt,
-		getAccountsStmt:        q.getAccountsStmt,
-		getAccountsGraphStmt:   q.getAccountsGraphStmt,
-		getAccountsReportsStmt: q.getAccountsReportsStmt,
-		getCategoriesStmt:      q.getCategoriesStmt,
-		getCategoryStmt:        q.getCategoryStmt,
-		getUserStmt:            q.getUserStmt,
-		getUserByIdStmt:        q.getUserByIdStmt,
-		updateAccountStmt:      q.updateAccountStmt,
-		updateCategoryStmt:     q.updateCategoryStmt,
+		db:                       tx,
+		tx:                       tx,
+		createAccountStmt:        q.createAccountStmt,
+		createCategoryStmt:       q.createCategoryStmt,
+		createUserStmt:           q.createUserStmt,
+		deleteAccountStmt:        q.deleteAccountStmt,
+		deleteCategoryStmt:       q.deleteCategoryStmt,
+		deleteUserStmt:           q.deleteUserStmt,
+		getAccountStmt:           q.getAccountStmt,
+		getAccountsStmt:          q.getAccountsStmt,
+		getAccountsGraphStmt:     q.getAccountsGraphStmt,
+		getAccountsReportsStmt:   q.getAccountsReportsStmt,
+		getCategoriesStmt:        q.getCategoriesStmt,
+		getCategoriesByTitleStmt: q.getCategoriesByTitleStmt,
+		getCategoryByIdStmt:      q.getCategoryByIdStmt,
+		getDeletedCategoriesStmt: q.getDeletedCategoriesStmt,
+		getDeletedCategoryStmt:   q.getDeletedCategoryStmt,
+		getDeletedUserStmt:       q.getDeletedUserStmt,
+		getDeletedUsersStmt:      q.getDeletedUsersStmt,
+		getUserStmt:              q.getUserStmt,
+		getUserByIdStmt:          q.getUserByIdStmt,
+		getUsersStmt:             q.getUsersStmt,
+		updateAccountStmt:        q.updateAccountStmt,
+		updateCategoryStmt:       q.updateCategoryStmt,
 	}
 }

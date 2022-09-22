@@ -112,15 +112,112 @@ func (q *Queries) GetCategories(ctx context.Context, arg GetCategoriesParams) ([
 	return items, nil
 }
 
-const getCategory = `-- name: GetCategory :one
+const getCategoriesByTitle = `-- name: GetCategoriesByTitle :many
+SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories 
+  WHERE title = $1 
+  AND deleted_at IS NULL
+`
+
+func (q *Queries) GetCategoriesByTitle(ctx context.Context, title string) ([]Category, error) {
+	rows, err := q.query(ctx, q.getCategoriesByTitleStmt, getCategoriesByTitle, title)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Category{}
+	for rows.Next() {
+		var i Category
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Description,
+			&i.Type,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCategoryById = `-- name: GetCategoryById :one
 SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories 
   WHERE id = $1 
   AND deleted_at IS NULL
   LIMIT 1
 `
 
-func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
-	row := q.queryRow(ctx, q.getCategoryStmt, getCategory, id)
+func (q *Queries) GetCategoryById(ctx context.Context, id int32) (Category, error) {
+	row := q.queryRow(ctx, q.getCategoryByIdStmt, getCategoryById, id)
+	var i Category
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Description,
+		&i.Type,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getDeletedCategories = `-- name: GetDeletedCategories :many
+SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories 
+  WHERE deleted_at IS NOT NULL
+`
+
+func (q *Queries) GetDeletedCategories(ctx context.Context) ([]Category, error) {
+	rows, err := q.query(ctx, q.getDeletedCategoriesStmt, getDeletedCategories)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Category{}
+	for rows.Next() {
+		var i Category
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Description,
+			&i.Type,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getDeletedCategory = `-- name: GetDeletedCategory :one
+SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories 
+  WHERE deleted_at IS NOT NULL
+  AND id = $1
+`
+
+func (q *Queries) GetDeletedCategory(ctx context.Context, id int32) (Category, error) {
+	row := q.queryRow(ctx, q.getDeletedCategoryStmt, getDeletedCategory, id)
 	var i Category
 	err := row.Scan(
 		&i.ID,
@@ -137,7 +234,7 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
 
 const updateCategory = `-- name: UpdateCategory :one
 UPDATE categories 
-  SET title = $2, description = $3, updated_at = CURRENT_TIMESTAMP
+  SET title = $2, description = $3, type = $4, updated_at = CURRENT_TIMESTAMP
   WHERE id = $1 
   RETURNING id, user_id, title, description, type, created_at, updated_at, deleted_at
 `
@@ -146,10 +243,16 @@ type UpdateCategoryParams struct {
 	ID          int32  `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	Type        string `json:"type"`
 }
 
 func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
-	row := q.queryRow(ctx, q.updateCategoryStmt, updateCategory, arg.ID, arg.Title, arg.Description)
+	row := q.queryRow(ctx, q.updateCategoryStmt, updateCategory,
+		arg.ID,
+		arg.Title,
+		arg.Description,
+		arg.Type,
+	)
 	var i Category
 	err := row.Scan(
 		&i.ID,

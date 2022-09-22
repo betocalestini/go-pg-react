@@ -40,6 +40,73 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const deleteUser = `-- name: DeleteUser :exec
+UPDATE users SET deleted_at = CURRENT_TIMESTAMP
+  WHERE id = $1
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
+	_, err := q.exec(ctx, q.deleteUserStmt, deleteUser, id)
+	return err
+}
+
+const getDeletedUser = `-- name: GetDeletedUser :one
+SELECT id, name, email, password, created_at, updated_at, deleted_at FROM users 
+  WHERE deleted_at IS NOT NULL
+  AND id = $1
+`
+
+func (q *Queries) GetDeletedUser(ctx context.Context, id int32) (User, error) {
+	row := q.queryRow(ctx, q.getDeletedUserStmt, getDeletedUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getDeletedUsers = `-- name: GetDeletedUsers :many
+SELECT id, name, email, password, created_at, updated_at, deleted_at FROM users 
+  WHERE deleted_at IS NOT NULL
+`
+
+func (q *Queries) GetDeletedUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.query(ctx, q.getDeletedUsersStmt, getDeletedUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.Password,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, name, email, password, created_at, updated_at, deleted_at FROM users 
   WHERE email = $1 
@@ -82,4 +149,40 @@ func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
 		&i.DeletedAt,
 	)
 	return i, err
+}
+
+const getUsers = `-- name: GetUsers :many
+SELECT id, name, email, password, created_at, updated_at, deleted_at FROM users 
+  WHERE deleted_at IS NULL
+`
+
+func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.query(ctx, q.getUsersStmt, getUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.Password,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
