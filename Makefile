@@ -10,6 +10,9 @@ migrateup:
 migrationdrop:
 	migrate -path db/migration -database "postgres://betocalestini:cpi10@host.docker.internal:5432/udemy?sslmode=disable" -verbose down
 
+sqlcgenerate:
+	docker run --rm -v $(pwd):/src -w /src kjconroy/sqlc generate
+
 test:
 	go test -v -cover ./...
 
