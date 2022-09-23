@@ -63,6 +63,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getCategoryByIdStmt, err = db.PrepareContext(ctx, getCategoryById); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCategoryById: %w", err)
 	}
+	if q.getDeletedAccountStmt, err = db.PrepareContext(ctx, getDeletedAccount); err != nil {
+		return nil, fmt.Errorf("error preparing query GetDeletedAccount: %w", err)
+	}
+	if q.getDeletedAccountsStmt, err = db.PrepareContext(ctx, getDeletedAccounts); err != nil {
+		return nil, fmt.Errorf("error preparing query GetDeletedAccounts: %w", err)
+	}
 	if q.getDeletedCategoriesStmt, err = db.PrepareContext(ctx, getDeletedCategories); err != nil {
 		return nil, fmt.Errorf("error preparing query GetDeletedCategories: %w", err)
 	}
@@ -158,6 +164,16 @@ func (q *Queries) Close() error {
 	if q.getCategoryByIdStmt != nil {
 		if cerr := q.getCategoryByIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getCategoryByIdStmt: %w", cerr)
+		}
+	}
+	if q.getDeletedAccountStmt != nil {
+		if cerr := q.getDeletedAccountStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getDeletedAccountStmt: %w", cerr)
+		}
+	}
+	if q.getDeletedAccountsStmt != nil {
+		if cerr := q.getDeletedAccountsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getDeletedAccountsStmt: %w", cerr)
 		}
 	}
 	if q.getDeletedCategoriesStmt != nil {
@@ -257,6 +273,8 @@ type Queries struct {
 	getCategoriesStmt        *sql.Stmt
 	getCategoriesByTitleStmt *sql.Stmt
 	getCategoryByIdStmt      *sql.Stmt
+	getDeletedAccountStmt    *sql.Stmt
+	getDeletedAccountsStmt   *sql.Stmt
 	getDeletedCategoriesStmt *sql.Stmt
 	getDeletedCategoryStmt   *sql.Stmt
 	getDeletedUserStmt       *sql.Stmt
@@ -285,6 +303,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getCategoriesStmt:        q.getCategoriesStmt,
 		getCategoriesByTitleStmt: q.getCategoriesByTitleStmt,
 		getCategoryByIdStmt:      q.getCategoryByIdStmt,
+		getDeletedAccountStmt:    q.getDeletedAccountStmt,
+		getDeletedAccountsStmt:   q.getDeletedAccountsStmt,
 		getDeletedCategoriesStmt: q.getDeletedCategoriesStmt,
 		getDeletedCategoryStmt:   q.getDeletedCategoryStmt,
 		getDeletedUserStmt:       q.getDeletedUserStmt,

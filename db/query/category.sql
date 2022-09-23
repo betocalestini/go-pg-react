@@ -19,6 +19,7 @@ SELECT * FROM categories
   WHERE title = $1 
   AND deleted_at IS NULL;
 
+
 -- name: GetCategories :many
 SELECT * FROM categories 
   WHERE user_id = $1

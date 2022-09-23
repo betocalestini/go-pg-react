@@ -55,3 +55,11 @@ UPDATE accounts
   SET deleted_at = CURRENT_TIMESTAMP
   WHERE id = $1;
 
+-- name: GetDeletedAccount :one
+SELECT * FROM accounts 
+  WHERE id = $1 
+  AND deleted_at IS NOT NULL;
+
+-- name: GetDeletedAccounts :many
+SELECT * FROM accounts 
+  WHERE deleted_at IS NOT NULL;

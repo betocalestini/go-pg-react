@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS "accounts" (
     "title" VARCHAR(255) NOT NULL,
     "type" VARCHAR(255) NOT NULL,
     "description" VARCHAR(255) NOT NULL,
-    "value" INTEGER NOT NULL,
+    "value" REAL NOT NULL,
     "date" DATE NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ, 
@@ -37,3 +37,5 @@ CREATE TABLE IF NOT EXISTS "accounts" (
     );
 ALTER TABLE "accounts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 ALTER TABLE "accounts" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
+
+SET TIMEZONE = 'America/Sao_Paulo';

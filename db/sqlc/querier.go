@@ -22,6 +22,8 @@ type Querier interface {
 	GetCategories(ctx context.Context, arg GetCategoriesParams) ([]Category, error)
 	GetCategoriesByTitle(ctx context.Context, title string) ([]Category, error)
 	GetCategoryById(ctx context.Context, id int32) (Category, error)
+	GetDeletedAccount(ctx context.Context, id int32) (Account, error)
+	GetDeletedAccounts(ctx context.Context) ([]Account, error)
 	GetDeletedCategories(ctx context.Context) ([]Category, error)
 	GetDeletedCategory(ctx context.Context, id int32) (Category, error)
 	GetDeletedUser(ctx context.Context, id int32) (User, error)

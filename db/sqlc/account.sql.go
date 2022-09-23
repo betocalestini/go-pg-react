@@ -31,7 +31,7 @@ type CreateAccountParams struct {
 	Title       string    `json:"title"`
 	Type        string    `json:"type"`
 	Description string    `json:"description"`
-	Value       int32     `json:"value"`
+	Value       float32   `json:"value"`
 	Date        time.Time `json:"date"`
 }
 
@@ -130,7 +130,7 @@ type GetAccountsRow struct {
 	Title         string         `json:"title"`
 	Type          string         `json:"type"`
 	Description   string         `json:"description"`
-	Value         int32          `json:"value"`
+	Value         float32        `json:"value"`
 	Date          time.Time      `json:"date"`
 	CreatedAt     time.Time      `json:"created_at"`
 	CategoryTitle sql.NullString `json:"category_title"`
@@ -216,6 +216,71 @@ func (q *Queries) GetAccountsReports(ctx context.Context, arg GetAccountsReports
 	return sum_value, err
 }
 
+const getDeletedAccount = `-- name: GetDeletedAccount :one
+SELECT id, user_id, category_id, title, type, description, value, date, created_at, updated_at, deleted_at FROM accounts 
+  WHERE id = $1 
+  AND deleted_at IS NOT NULL
+`
+
+func (q *Queries) GetDeletedAccount(ctx context.Context, id int32) (Account, error) {
+	row := q.queryRow(ctx, q.getDeletedAccountStmt, getDeletedAccount, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.CategoryID,
+		&i.Title,
+		&i.Type,
+		&i.Description,
+		&i.Value,
+		&i.Date,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getDeletedAccounts = `-- name: GetDeletedAccounts :many
+SELECT id, user_id, category_id, title, type, description, value, date, created_at, updated_at, deleted_at FROM accounts 
+  WHERE deleted_at IS NOT NULL
+`
+
+func (q *Queries) GetDeletedAccounts(ctx context.Context) ([]Account, error) {
+	rows, err := q.query(ctx, q.getDeletedAccountsStmt, getDeletedAccounts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Account{}
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.CategoryID,
+			&i.Title,
+			&i.Type,
+			&i.Description,
+			&i.Value,
+			&i.Date,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateAccount = `-- name: UpdateAccount :one
 UPDATE accounts  
   SET title = $2, description = $3, value = $4, updated_at = CURRENT_TIMESTAMP
@@ -224,10 +289,10 @@ UPDATE accounts
 `
 
 type UpdateAccountParams struct {
-	ID          int32  `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Value       int32  `json:"value"`
+	ID          int32   `json:"id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Value       float32 `json:"value"`
 }
 
 func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error) {
