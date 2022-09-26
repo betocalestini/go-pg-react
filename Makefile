@@ -1,5 +1,5 @@
 createdb:
-	createdb --username=userPostgres --owner=postgres go_finance
+	createdb --username=userPostgres --owner=userPostgres go_finance
 
 postgres:
 	docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=senhaPostgres -d postgres:14-alpine 
