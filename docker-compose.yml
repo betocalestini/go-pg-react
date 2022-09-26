@@ -6,9 +6,9 @@ services:
       container_name: postgres-udemy
       restart: always
       environment:
-         - POSTGRES_USER=betocalestini
-         - POSTGRES_PASSWORD=cpi10
-         - POSTGRES_DB=udemy
+         - POSTGRES_USER=userPostgres
+         - POSTGRES_DB=go_finance
+         - POSTGRES_PASSWORD=senhaPostgres
          - TimeZone=America/Sao_Paulo
       ports:
          - '5432:5432'
@@ -26,7 +26,7 @@ services:
       restart: always
       environment:
          PGADMIN_DEFAULT_EMAIL: 'betocalestini@hotmail.com'
-         PGADMIN_DEFAULT_PASSWORD: '/cpi10'
+         PGADMIN_DEFAULT_PASSWORD: 'senhaPgAdmin'
          TimeZone: 'America/Sao_Paulo'
       ports:
          - '8080:80'
