@@ -31,7 +31,7 @@ type CreateAccountParams struct {
 	Title       string    `json:"title"`
 	Type        string    `json:"type"`
 	Description string    `json:"description"`
-	Value       float32   `json:"value"`
+	Value       string    `json:"value"`
 	Date        time.Time `json:"date"`
 }
 
@@ -130,7 +130,7 @@ type GetAccountsRow struct {
 	Title         string         `json:"title"`
 	Type          string         `json:"type"`
 	Description   string         `json:"description"`
-	Value         float32        `json:"value"`
+	Value         string         `json:"value"`
 	Date          time.Time      `json:"date"`
 	CreatedAt     time.Time      `json:"created_at"`
 	CategoryTitle sql.NullString `json:"category_title"`
@@ -209,9 +209,9 @@ type GetAccountsReportsParams struct {
 	Type   string `json:"type"`
 }
 
-func (q *Queries) GetAccountsReports(ctx context.Context, arg GetAccountsReportsParams) (int64, error) {
+func (q *Queries) GetAccountsReports(ctx context.Context, arg GetAccountsReportsParams) ([]uint8, error) {
 	row := q.queryRow(ctx, q.getAccountsReportsStmt, getAccountsReports, arg.UserID, arg.Type)
-	var sum_value int64
+	var sum_value []uint8
 	err := row.Scan(&sum_value)
 	return sum_value, err
 }
@@ -289,10 +289,10 @@ UPDATE accounts
 `
 
 type UpdateAccountParams struct {
-	ID          int32   `json:"id"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Value       float32 `json:"value"`
+	ID          int32  `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Value       string `json:"value"`
 }
 
 func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error) {

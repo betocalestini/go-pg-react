@@ -14,9 +14,9 @@ func CreateRandomAccount(t *testing.T) Account {
 		UserID:      category.UserID,
 		CategoryID:  category.ID,
 		Title:       util.RandomName(10),
-		Type:        util.RandomName(8),
+		Type:        category.Type,
 		Description: util.RandomName(50),
-		Value:       util.RandomFloat(2, 2),
+		Value:       util.RandomFloatString(3, 2),
 		Date:        util.RandomDate(),
 	}
 
@@ -33,7 +33,6 @@ func CreateRandomAccount(t *testing.T) Account {
 
 	accountDate := account.Date.Format("02/01/2006 03:04:05")
 	argDate := arg.Date.Format("02/01/2006 03:04:05")
-
 	require.Equal(t, accountDate, argDate)
 	require.NotEmpty(t, account.CreatedAt)
 
@@ -91,17 +90,22 @@ func Test_GetAccounts(t *testing.T) {
 	accounts, err := testQueries.GetAccounts(context.Background(), arg)
 	require.NoError(t, err)
 
+	category, err := testQueries.GetCategoryById(context.Background(), account1.CategoryID)
+	require.NoError(t, err)
+
 	for _, account := range accounts {
 		require.Equal(t, account1.UserID, account.UserID)
 		require.Equal(t, account1.Title, account.Title)
 		require.Equal(t, account1.Type, account.Type)
 		require.Equal(t, account1.Description, account.Description)
 		require.Equal(t, account1.Value, account.Value)
-		require.NotEmpty(t, account.CreatedAt)
+		require.Equal(t, account.CategoryTitle.String, category.Title)
+
 		account1Date := account1.Date.Format("02/01/2006 03:04:05")
 		accountDate := account.Date.Format("02/01/2006 03:04:05")
-
 		require.Equal(t, account1Date, accountDate)
+
+		require.NotEmpty(t, account.CreatedAt)
 	}
 }
 
@@ -153,7 +157,7 @@ func Test_UpdateAccount(t *testing.T) {
 		ID:          account1.ID,
 		Title:       util.RandomName(10),
 		Description: util.RandomName(50),
-		Value:       util.RandomFloat(2, 2),
+		Value:       util.RandomFloatString(2, 2),
 	}
 
 	account2, err := testQueries.UpdateAccount(context.Background(), arg)
@@ -167,7 +171,35 @@ func Test_UpdateAccount(t *testing.T) {
 	require.Equal(t, account1.CreatedAt, account2.CreatedAt)
 
 	require.NotEqual(t, account1.UpdatedAt, account2.UpdatedAt)
+	require.NotEqual(t, account1.Title, account2.Title)
+	require.NotEqual(t, account1.Description, account2.Description)
+	require.NotEqual(t, account1.Value, account2.Value)
 
 	require.NotEmpty(t, account2)
 	require.NotEmpty(t, account2.UpdatedAt)
+}
+
+func Test_GetAccountsReports(t *testing.T) {
+	account1 := CreateRandomAccount(t)
+	arg := GetAccountsReportsParams{
+		UserID: account1.UserID,
+		Type:   account1.Type,
+	}
+	//para realizar este teste foram alterados os tipos de retorno em GetAccountsReports para []uint8
+	sumValues, err := testQueries.GetAccountsReports(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, sumValues)
+
+}
+
+func Test_GetAccountsGraph(t *testing.T) {
+	account1 := CreateRandomAccount(t)
+	arg := GetAccountsGraphParams{
+		UserID: account1.UserID,
+		Type:   account1.Type,
+	}
+	sumAccounts, err := testQueries.GetAccountsGraph(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, sumAccounts)
+
 }

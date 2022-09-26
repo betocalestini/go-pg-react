@@ -16,7 +16,7 @@ type Account struct {
 	Title       string       `json:"title"`
 	Type        string       `json:"type"`
 	Description string       `json:"description"`
-	Value       float32      `json:"value"`
+	Value       string       `json:"value"`
 	Date        time.Time    `json:"date"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   sql.NullTime `json:"updated_at"`

@@ -68,6 +68,22 @@ func RandomNumber(n int) int {
 }
 
 // gerar número aletório com n digitos e d casas decimais
+func RandomFloatString(n, d int) string {
+	var stringOfNumber string
+	if n > 1 {
+		primeiroDigito := Random(1, numbers)
+		if primeiroDigito != "0" {
+			stringOfNumber = primeiroDigito + Random(n-1, numbers) + "." + Random(d, numbers)
+		} else {
+			stringOfNumber = Random(n-1, numbers) + "." + Random(d, numbers)
+		}
+	} else {
+		stringOfNumber = Random(n, numbers) + "." + Random(d, numbers)
+	}
+	return stringOfNumber
+}
+
+// gerar número aletório com n digitos e d casas decimais
 func RandomFloat(n, d int) float32 {
 	stringOfNumber := Random(n, numbers) + "." + Random(d, numbers)
 	number, err := strconv.ParseFloat(stringOfNumber, 64)
@@ -172,5 +188,12 @@ func RandomFullDate() time.Time {
 // func main() {
 // 	fmt.Println(RandomDate())
 // 	fmt.Println(RandomFullDate())
-
+// 	fmt.Println(RandomEmail())
+// 	fmt.Println(RandomName(15))
+// 	fmt.Println(RandomSenha(15))
+// 	fmt.Println(RandomFloat(2, 2))
+// 	fmt.Println(RandomFloatString(1, 2))
+// 	fmt.Println(RandomFloatString(2, 2))
+// 	fmt.Println(RandomFloatString(3, 2))
+// 	fmt.Println(RandomFloatString(4, 2))
 // }
