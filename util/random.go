@@ -84,13 +84,13 @@ func RandomFloatString(n, d int) string {
 }
 
 // gerar número aletório com n digitos e d casas decimais
-func RandomFloat(n, d int) float32 {
+func RandomFloat(n, d int) float64 {
 	stringOfNumber := Random(n, numbers) + "." + Random(d, numbers)
 	number, err := strconv.ParseFloat(stringOfNumber, 64)
 	if err != nil {
 		panic(err)
 	}
-	return float32(number)
+	return number
 }
 
 // gerar ano aleatório com 4 dígitos até 2029
