@@ -2,8 +2,9 @@ package db
 
 import (
 	"context"
-	"go-pg-react/util"
 	"testing"
+
+	"github.com/betocalestini/go-pg-react/util"
 
 	"github.com/stretchr/testify/require"
 )
