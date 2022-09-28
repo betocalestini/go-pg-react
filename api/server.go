@@ -13,3 +13,8 @@ type Server struct {
 func (server *Server) Start(address string) error {
 	return server.router.Listen(address)
 }
+
+func errorResponse(err error) fiber.Map {
+	return fiber.Map{
+		"api has error:": err.Error()}
+}
