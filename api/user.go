@@ -2,7 +2,6 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"strconv"
 
 	db "github.com/betocalestini/go-pg-react/db/sqlc"
@@ -10,9 +9,9 @@ import (
 )
 
 type createUserRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 func (server *Server) createUser(c *fiber.Ctx) error {
@@ -35,13 +34,18 @@ func (server *Server) createUser(c *fiber.Ctx) error {
 	}
 }
 
-func (server *Server) getUser(c *fiber.Ctx) error {
-	param := c.Params("email")
+type getUserRequest struct {
+	Email string `json:"email" validate:"required"`
+}
 
-	user, err := server.store.GetUser(c.Context(), param)
+func (server *Server) getUser(c *fiber.Ctx) error {
+	req := getUserRequest{Email: c.Params("email")}
+
+	user, err := server.store.GetUser(c.Context(), req.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return c.Status(fiber.StatusNotFound).JSON(err)
+
+			return c.Status(fiber.StatusNotFound).JSON(errorResponse(err))
 		} else {
 			return c.Status(fiber.StatusInternalServerError).JSON(err)
 		}
@@ -54,7 +58,7 @@ func (server *Server) getUser(c *fiber.Ctx) error {
 func (server *Server) getUserById(c *fiber.Ctx) error {
 	param := c.Params("id")
 	paramId, _ := strconv.ParseInt(param, 10, 32)
-	fmt.Println(paramId)
+
 	user, err := server.store.GetUserById(c.Context(), int32(paramId))
 	if err != nil {
 		if err == sql.ErrNoRows {
