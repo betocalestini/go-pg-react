@@ -1,6 +1,18 @@
 version: '3'
 
 services:
+   app:
+      build: .
+      container_name: golang
+      volumes:
+         - .:/go/src/
+      ports:
+         - '8000:8000'
+      # extra_hosts:
+      #    - 'host.docker.internal:172.17.0.1'
+      networks:
+         - rede1
+
    postgres:
       image: 'postgres:latest'
       container_name: postgres-udemy
@@ -15,10 +27,12 @@ services:
       volumes:
          - /home/betocalestini/postgres-udemy:/var/lib/postgresql/data
          - ./db/migration/docker-database-initial.sql:/docker-entrypoint-initdb.d/docker-database-initial.sql
+      # extra_hosts:
+      #    - 'host.docker.internal:172.17.0.1'
       networks:
-         rede1:
-            # aliases:
-            #    - database
+         - rede1
+           # aliases:
+           #    - database
 
    pgadmin-compose:
       image: dpage/pgadmin4
