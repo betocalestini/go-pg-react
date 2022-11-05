@@ -15,13 +15,13 @@ func Connect() (string, *sql.DB) {
 		log.Fatal("Error loading .env file")
 	}
 
-	DbUser := os.Getenv("DbUser")
-	DbPassword := os.Getenv("DbPassword")
-	DbHost := os.Getenv("DbHost")
-	DbPort := os.Getenv("DbPort")
-	DbDatabase := os.Getenv("DbDatabase")
-	DbDriver := os.Getenv("DbDriver")
-	ServerAddress := os.Getenv("ServerAddress")
+	DbUser := os.Getenv("DB_USER")
+	DbPassword := os.Getenv("DB_PASSWORD")
+	DbHost := os.Getenv("DB_HOST")
+	DbPort := os.Getenv("DB_PORT")
+	DbDatabase := os.Getenv("DB_DATABASE")
+	DbDriver := os.Getenv("DB_DRIVER")
+	ServerAddress := os.Getenv("SERVER_ADDRESS")
 
 	conn, err := sql.Open(DbDriver, "postgresql://"+DbUser+":"+DbPassword+"@"+DbHost+":"+DbPort+"/"+DbDatabase+"?sslmode=disable")
 	if err != nil {
