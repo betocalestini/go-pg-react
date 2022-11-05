@@ -28,6 +28,12 @@ SELECT * FROM categories
   AND title like $3 
   AND description LIKE $4;
 
+
+-- name: GetAllCategories :many
+SELECT * FROM categories 
+  WHERE deleted_at IS NULL;
+
+
 -- name: UpdateCategory :one
 UPDATE categories 
   SET title = $2, description = $3, type = $4, updated_at = CURRENT_TIMESTAMP
