@@ -6,7 +6,7 @@ import (
 )
 
 func StructToSlice(x interface{}) []interface{} {
-	v := reflect.ValueOf(x)
+	v := reflect.Indirect(reflect.ValueOf(x))
 	values := make([]interface{}, v.NumField())
 	for i := 0; i < v.NumField(); i++ {
 		values[i] = v.Field(i).Interface()
