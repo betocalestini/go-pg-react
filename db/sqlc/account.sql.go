@@ -209,9 +209,9 @@ type GetAccountsReportsParams struct {
 	Type   string `json:"type"`
 }
 
-func (q *Queries) GetAccountsReports(ctx context.Context, arg GetAccountsReportsParams) ([]uint8, error) {
+func (q *Queries) GetAccountsReports(ctx context.Context, arg GetAccountsReportsParams) (int64, error) {
 	row := q.queryRow(ctx, q.getAccountsReportsStmt, getAccountsReports, arg.UserID, arg.Type)
-	var sum_value []uint8
+	var sum_value int64
 	err := row.Scan(&sum_value)
 	return sum_value, err
 }

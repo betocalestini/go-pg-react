@@ -54,6 +54,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getAccountsReportsStmt, err = db.PrepareContext(ctx, getAccountsReports); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAccountsReports: %w", err)
 	}
+	if q.getAllCategoriesStmt, err = db.PrepareContext(ctx, getAllCategories); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllCategories: %w", err)
+	}
 	if q.getCategoriesStmt, err = db.PrepareContext(ctx, getCategories); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCategories: %w", err)
 	}
@@ -149,6 +152,11 @@ func (q *Queries) Close() error {
 	if q.getAccountsReportsStmt != nil {
 		if cerr := q.getAccountsReportsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getAccountsReportsStmt: %w", cerr)
+		}
+	}
+	if q.getAllCategoriesStmt != nil {
+		if cerr := q.getAllCategoriesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllCategoriesStmt: %w", cerr)
 		}
 	}
 	if q.getCategoriesStmt != nil {
@@ -270,6 +278,7 @@ type Queries struct {
 	getAccountsStmt          *sql.Stmt
 	getAccountsGraphStmt     *sql.Stmt
 	getAccountsReportsStmt   *sql.Stmt
+	getAllCategoriesStmt     *sql.Stmt
 	getCategoriesStmt        *sql.Stmt
 	getCategoriesByTitleStmt *sql.Stmt
 	getCategoryByIdStmt      *sql.Stmt
@@ -300,6 +309,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getAccountsStmt:          q.getAccountsStmt,
 		getAccountsGraphStmt:     q.getAccountsGraphStmt,
 		getAccountsReportsStmt:   q.getAccountsReportsStmt,
+		getAllCategoriesStmt:     q.getAllCategoriesStmt,
 		getCategoriesStmt:        q.getCategoriesStmt,
 		getCategoriesByTitleStmt: q.getCategoriesByTitleStmt,
 		getCategoryByIdStmt:      q.getCategoryByIdStmt,
