@@ -5,10 +5,10 @@ postgres:
 	docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=senhaPostgres -d postgres:14-alpine 
 
 migrateup:
-	migrate -path db/migration -database "postgres://userPostgres:senhaPostgres@postgres:5432/go_finance?sslmode=disable" -verbose up
+	migrate -path db/migration -database "postgres://userPostgres:localhost@postgres:5432/go_finance?sslmode=disable" -verbose up
 
 migrationdrop:
-	migrate -path db/migration -database "postgres://userPostgres:senhaPostgres@postgres:5432/go_finance?sslmode=disable" -verbose down
+	migrate -path db/migration -database "postgres://userPostgres:localhost@postgres:5432/go_finance?sslmode=disable" -verbose down
 
 sqlcgenerate:
 	docker run --rm -v $(pwd):/src -w /src kjconroy/sqlc generate
