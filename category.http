@@ -1,0 +1,55 @@
+//Listar todas as categorias
+GET http://localhost:8000/categories HTTP/1.1
+
+###
+//Listar categorias deletadas
+GET http://localhost:8000/categories/deleted HTTP/1.1
+
+
+###
+//Selecionar categoria por título
+GET http://localhost:8000/categories/kWVGzXVqpF HTTP/1.1
+
+
+###
+//Selecionar categoria por id
+GET http://localhost:8000/category/3 HTTP/1.1
+
+###
+//Deletar categoria por id
+DELETE http://localhost:8000/category/31 HTTP/1.1
+
+###
+//Selecionar categoria DELETADA por id
+GET http://localhost:8000/category/deleted/30 HTTP/1.1
+
+###
+//Criar categoria
+POST http://localhost:8000/category HTTP/1.1
+content-type: application/json
+
+{ 
+    "user_id" : "1" ,
+    "type" :  "asdasdsa",
+    "title" : "asdfadasd",
+    "description" : "asdasdsadsadadasd"
+}
+
+
+###
+//atualizar categoria
+PUT http://localhost:8000/category HTTP/1.1
+content-type: application/json
+
+{
+    "id" : "36",
+    "user_id" : "1",
+    "type" :  "yurtytryrtyr",
+    "title" : "rtyrtyrtyrt",
+    "description" : "rtyrtyrtyrtyrtyrtytr"
+}
+
+
+
+
+	
