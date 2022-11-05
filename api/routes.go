@@ -19,15 +19,15 @@ func Routes(app *fiber.App, server *Server) {
 
 	app.Put("/category", server.updateCategory)
 
-	app.Get("/category/id/:id", server.getCategoryById)
-	app.Get("/category/deleted", server.getDeletedCategories)
+	app.Get("/category/:id", server.getCategoryById)
 	app.Get("/category/deleted/:id", server.getDeletedCategory)
+	app.Delete("/category/:id", server.deleteCategory)
 
 	app.Post("/categories", server.getCategories)
-
-	app.Delete("/category/id/:id", server.deleteCategory)
-
+	app.Get("/categories", server.getAllCategories)
+	app.Get("/categories/deleted", server.getDeletedCategories)
 	app.Get("/categories/:title", server.getCategoriesByTitle)
+
 	// app.Get("/categories", server.store.GetCategories())
 
 }
