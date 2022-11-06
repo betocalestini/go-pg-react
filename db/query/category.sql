@@ -21,13 +21,11 @@ SELECT * FROM categories
 
 
 -- name: GetCategories :many
-SELECT * FROM categories 
+SELECT * FROM categories
   WHERE user_id = $1
-  AND deleted_at IS NULL
-  AND type = $2 
-  AND title like $3 
-  AND description LIKE $4;
-
+  AND type = $2
+  AND LOWER(title) LIKE CONCAT('%', LOWER(@title::text), '%')
+  AND LOWER(description) LIKE CONCAT('%', LOWER(@description::text), '%');
 
 -- name: GetAllCategories :many
 SELECT * FROM categories 
