@@ -32,6 +32,11 @@ SELECT a.id, a.user_id, a.title, a.type, a.description, a.value, a.date, a.creat
     AND a.deleted_at IS NULL
   ORDER BY a.date DESC;
 
+-- name: GetAllAccounts :many
+  SELECT * from accounts 
+    WHERE deleted_at IS NULL;
+
+
 -- name: GetAccountsReports :one
 SELECT SUM(value) AS sum_value FROM accounts
   WHERE user_id = $1 
