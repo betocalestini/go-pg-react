@@ -97,12 +97,11 @@ func (q *Queries) GetAllCategories(ctx context.Context) ([]Category, error) {
 }
 
 const getCategories = `-- name: GetCategories :many
-SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories 
+SELECT id, user_id, title, description, type, created_at, updated_at, deleted_at FROM categories
   WHERE user_id = $1
-  AND deleted_at IS NULL
-  AND type = $2 
-  AND title like $3 
-  AND description LIKE $4
+  AND type = $2
+  AND LOWER(title) LIKE CONCAT('%', LOWER($3::text), '%')
+  AND LOWER(description) LIKE CONCAT('%', LOWER($4::text), '%')
 `
 
 type GetCategoriesParams struct {
