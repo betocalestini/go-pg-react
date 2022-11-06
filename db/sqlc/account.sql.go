@@ -216,6 +216,46 @@ func (q *Queries) GetAccountsReports(ctx context.Context, arg GetAccountsReports
 	return sum_value, err
 }
 
+const getAllAccounts = `-- name: GetAllAccounts :many
+  SELECT id, user_id, category_id, title, type, description, value, date, created_at, updated_at, deleted_at from accounts 
+    WHERE deleted_at IS NULL
+`
+
+func (q *Queries) GetAllAccounts(ctx context.Context) ([]Account, error) {
+	rows, err := q.query(ctx, q.getAllAccountsStmt, getAllAccounts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Account{}
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.CategoryID,
+			&i.Title,
+			&i.Type,
+			&i.Description,
+			&i.Value,
+			&i.Date,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getDeletedAccount = `-- name: GetDeletedAccount :one
 SELECT id, user_id, category_id, title, type, description, value, date, created_at, updated_at, deleted_at FROM accounts 
   WHERE id = $1 
