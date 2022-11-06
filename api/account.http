@@ -1,0 +1,81 @@
+//Criar account
+POST http://localhost:8000/account HTTP/1.1
+content-type: application/json
+
+{ 
+    "user_id" : "29" ,
+    "category_id" : "1" ,
+    "type" :  "asdasdsa",
+    "title" : "asdfadasd",
+    "description" : "asdasdsadsadadasd",
+    "value" : "25.00"
+}
+
+###
+//Deletar account por id
+DELETE http://localhost:8000/account/11 HTTP/1.1
+
+
+###
+//Selecionar account por id
+GET http://localhost:8000/account/12 HTTP/1.1
+
+
+###
+//Selecionar accounts reports
+GET http://localhost:8000/accounts/reports/29/asdasdsa HTTP/1.1
+
+
+###
+//Selecionar accounts graph
+GET http://localhost:8000/accounts/graph/29/asdasdsa HTTP/1.1
+
+
+###
+//Selecionar accounts por variaveis
+POST http://localhost:8000/accounts HTTP/1.1
+content-type: application/json
+
+{
+    "user_id" : "9",
+    "category_id" : "9",
+    "type" :  "zkrpHxrC",
+    "title" : "rSZxmzLEGT",
+    "description" : "aMuJjsfSMkQLTijMgbYKwnEnQtftOJU WOmLy GWFmDCcLPCXt",
+    "date" : "2027-08-23T00:00:00Z"
+}
+
+
+###
+//Listar todos os accounts
+GET http://localhost:8000/accounts HTTP/1.1
+
+
+###
+//Selecionar account DELETADA por id
+GET http://localhost:8000/account/deleted/10 HTTP/1.1
+
+
+###
+//Listar accounts deletadas
+GET http://localhost:8000/accounts/deleted HTTP/1.1
+
+
+
+###
+//atualizar account
+PUT http://localhost:8000/account HTTP/1.1
+content-type: application/json
+
+{
+    "id" : 9,
+    "title" : "rtyrtyrtyrt",
+    "type" : "rtyrtyrtyrt",
+    "description" : "rtyrtyrtyrtyrtyrtytr",
+    "value" :  "yurtytryrtyr"
+}
+
+
+
+
+	
