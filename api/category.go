@@ -135,7 +135,7 @@ func (server *Server) getCategories(c *fiber.Ctx) error {
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(err)
 	}
-	if err := util.Validate.StructExcept(body, "ID"); err != nil {
+	if err := util.Validate.StructPartial(body, "UserID"); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResponse(err))
 	}
 
